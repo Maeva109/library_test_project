@@ -30,6 +30,19 @@ class TestBookForm:
         assert not form.is_valid()
         assert 'isbn' in form.errors
 
+    def test_book_form_missing_title(self, author):
+        form_data = {
+            'author': author.id,
+            'isbn': '1234567890123',
+            'category': 'FICTION',
+            'publication_date': '2023-01-01',
+            'quantity': 5,
+            'available': 5
+        }
+        form = BookForm(data=form_data)
+        assert not form.is_valid()
+        assert 'title' in form.errors
+
 @pytest.mark.django_db
 class TestBorrowForm:
     def test_borrow_available_book(self, book, member):

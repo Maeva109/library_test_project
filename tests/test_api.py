@@ -15,17 +15,15 @@ class TestBookAPI:
 
     def test_create_book(self, author):
         client = APIClient()
-        url = reverse('library:book-list')  # Using router-generated URL name
+        url = reverse('library:book-list')
         data = {
             'title': 'API Test Book',
-            'author': author.id,
+            'author': author.id,  # Use the fixture's author ID
             'isbn': '9876543210987',
             'publication_date': '2023-01-01',
             'quantity': 3,
             'available': 3
         }
         response = client.post(url, data, format='json')
-        assert response.status_code == 201
+        assert response.status_code == 201, f"Expected 201, got {response.status_code}. Response: {response.data}"
         assert Book.objects.count() == 1
-
-    

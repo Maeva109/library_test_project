@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Authors</h1>
+<a href="{% url 'library:author_add' %}">Add Author</a>
+<ul>
+{% for author in authors %}
+    <li>
+        <a href="{% url 'library:author_detail' author.pk %}">{{ author }}</a>
+        <a href="{% url 'library:author_update' author.pk %}">Edit</a>
+        <a href="{% url 'library:author_delete' author.pk %}">Delete</a>
+    </li>
+{% endfor %}
+</ul>
+{% endblock %}

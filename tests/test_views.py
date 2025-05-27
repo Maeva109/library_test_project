@@ -12,18 +12,19 @@ class TestBookViews(TestCase):
             isbn="1234567890123",
             publication_date="2023-01-01",
             quantity=5,
-            available=5
+            available=5,
+            category="FICTION"
         )
         cls.client = Client()
 
     def test_book_list_view(self):
-        url = reverse('library:book_list')
+        url = reverse('library:book-list')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.book.title)
 
     def test_book_search_view(self):
-        url = reverse('library:book_search') + '?q=Test'
+        url = reverse('library:book-search') + '?q=Test'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, self.book.title)

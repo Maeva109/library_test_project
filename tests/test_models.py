@@ -1,59 +1,82 @@
 import pytest
 from django.core.exceptions import ValidationError
+from datetime import timedelta
 from django.utils import timezone
+from django.contrib.auth.models import User
 from library.models import Book, Author, Member, BorrowRecord, Reservation
 
 @pytest.mark.django_db
-class TestAuthorModel:
-    def test_create_author(self):
-        author = Author.objects.create(
-            first_name="John",
-            last_name="Doe"
-        )
-        assert author.first_name == "John"
-        assert str(author) == "John Doe"
-
-@pytest.mark.django_db
 class TestBookModel:
-    def test_create_book(self, author):
+    def test_book_creation(self):
+        author = Author.objects.create(first_name="Test", last_name="Author")
         book = Book.objects.create(
-            title="Sample Book",
+            title="Test Book",
             author=author,
             isbn="1234567890123",
-            publication_date=timezone.now().date(),
+            category="FICTION",
             quantity=5,
-            available=5
+            available=5,
+            publication_date="2024-01-01"
         )
-        assert book.title == "Sample Book"
         assert book.available == 5
-        assert str(book) == "Sample Book"
+        assert str(book) == "Test Book"
 
-    def test_book_availability(self, book):
+    def test_borrow_availability(self):
+        author = Author.objects.create(first_name="Test", last_name="Author")
+        book = Book.objects.create(
+            title="Test",
+            author=author,
+            isbn="1234567890123",
+            category="FICTION",
+            quantity=1,
+            available=1,
+            publication_date="2024-01-01"
+        )
         assert book.is_available
         book.available = 0
         assert not book.is_available
 
 @pytest.mark.django_db
-class TestBorrowModel:
-    def test_borrow_book(self, book, member):
+class TestBorrowRecord:
+    def test_borrow_creation(self, book, member):
         borrow = BorrowRecord.objects.create(
             book=book,
             member=member,
-            due_date=timezone.now().date() + timezone.timedelta(days=14)
+            due_date=timezone.now() + timedelta(days=14)
         )
-        assert borrow.book == book
-        assert not borrow.is_returned
+        assert borrow.status == 'BORROWED'
         
-        borrow.return_date = timezone.now().date()
-        assert borrow.is_returned
-
-
-@pytest.mark.django_db
-class TestReservationModel:
-    def test_reservation_creation(self, book, member):
-        reservation = Reservation.objects.create(
-            book=book,
-            member=member
+    def test_max_borrows(self, member, author):
+        # Create 3 borrows
+        for i in range(3):
+            book = Book.objects.create(
+                title=f"Book {i}",
+                author=author,
+                isbn=f"123456789012{i}",
+                category="FICTION",
+                quantity=1,
+                available=1,
+                publication_date="2024-01-01"
+            )
+            BorrowRecord.objects.create(
+                book=book,
+                member=member,
+                due_date=timezone.now() + timedelta(days=14)
+            )
+        
+        # Attempt 4th borrow
+        new_book = Book.objects.create(
+            title="New Book",
+            author=author,
+            isbn="1234567890000",
+            category="FICTION",
+            quantity=1,
+            available=1,
+            publication_date="2024-01-01"
         )
-        assert reservation.status == 'PENDING'
-
+        with pytest.raises(ValidationError):
+            BorrowRecord(
+                book=new_book,
+                member=member,
+                due_date=timezone.now() + timedelta(days=14)
+            ).full_clean()

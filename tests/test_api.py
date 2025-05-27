@@ -1,29 +1,36 @@
 import pytest
 from rest_framework.test import APIClient
-from django.urls import reverse
-from library.models import Book, Author
+from rest_framework import status
 
 @pytest.mark.django_db
 class TestBookAPI:
-    def test_list_books(self, book):
+    def test_api_crud(self, author):
         client = APIClient()
-        url = reverse('library:book-list')  # Using router-generated URL name
-        response = client.get(url)
-        assert response.status_code == 200
-        assert len(response.data) == 1
-        assert response.data[0]['title'] == book.title
-
-    def test_create_book(self, author):
-        client = APIClient()
-        url = reverse('library:book-list')
-        data = {
-            'title': 'API Test Book',
-            'author': author.id,  # Use the fixture's author ID
-            'isbn': '9876543210987',
-            'publication_date': '2023-01-01',
-            'quantity': 3,
-            'available': 3
-        }
-        response = client.post(url, data, format='json')
-        assert response.status_code == 201, f"Expected 201, got {response.status_code}. Response: {response.data}"
-        assert Book.objects.count() == 1
+        
+        # CREATE
+        response = client.post('/api/books/', {
+            'title': 'API Book',
+            'author': author.id,
+            'isbn': '1234567890123',
+            'category': 'FICTION',
+            'quantity': 2,
+            'available': 2,
+            'publication_date': '2024-01-01'
+        }, format='json')
+        assert response.status_code == status.HTTP_201_CREATED
+        book_id = response.data['id']
+        
+        # READ
+        response = client.get('/api/books/')
+        assert response.status_code == status.HTTP_200_OK
+        assert any(book['id'] == book_id for book in response.data)
+        
+        # UPDATE
+        response = client.patch(f'/api/books/{book_id}/', {
+            'title': 'Updated Title'
+        }, format='json')
+        assert response.status_code == status.HTTP_200_OK
+        
+        # DELETE
+        response = client.delete(f'/api/books/{book_id}/')
+        assert response.status_code == status.HTTP_204_NO_CONTENT

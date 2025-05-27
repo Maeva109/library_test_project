@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+    .card-title i { color: #2563eb; margin-right: 0.5rem; }
+    .card { border-radius: 1rem; box-shadow: 0 2px 16px rgba(37,99,235,0.08); }
+    .btn-primary { background: #2563eb; border: none; }
+    .btn-secondary { background: #64748b; border: none; }
+    .btn-primary:hover, .btn-secondary:hover { opacity: 0.85; }
+    body, .form-control, .form-select, .btn { font-family: 'Poppins', Arial, sans-serif; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-body p-4">
+                <h2 class="card-title mb-4 text-center">
+                    <i class="fa-solid fa-book"></i> {{ book.title }}
+                </h2>
+                <ul class="list-group list-group-flush mb-4">
+                    <li class="list-group-item"><strong><i class="fa-solid fa-user-pen"></i> Author:</strong> {{ book.author }}</li>
+                    <li class="list-group-item"><strong><i class="fa-solid fa-layer-group"></i> Category:</strong> {{ book.get_category_display }}</li>
+                    <li class="list-group-item"><strong><i class="fa-solid fa-barcode"></i> ISBN:</strong> {{ book.isbn }}</li>
+                    <li class="list-group-item"><strong><i class="fa-solid fa-calendar-day"></i> Publication Date:</strong> {{ book.publication_date|date:"Y-m-d" }}</li>
+                    <li class="list-group-item"><strong><i class="fa-solid fa-boxes-stacked"></i> Stock:</strong> 
+                        <span class="badge bg-primary">{{ book.available }}</span>
+                        <span class="text-muted">/ {{ book.quantity }}</span>
+                    </li>
+                </ul>
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'library:book-update' book.pk %}" class="btn btn-warning">
+                        <i class="fa-solid fa-pen"></i> Edit
+                    </a>
+                    <a href="{% url 'library:book-list' %}" class="btn btn-secondary">
+                        <i class="fa-solid fa-arrow-left"></i> Back to List
+                    </a>
+                    <a href="{% url 'library:reservation-add' %}?book={{ book.pk }}" class="btn btn-info">
+                        <i class="fa-solid fa-calendar-plus"></i> Reserve
+                    </a>
+                    {% if book.available > 0 %}
+                    <a href="{% url 'library:borrow-book' book.pk %}" class="btn btn-primary">
+                        <i class="fa-solid fa-book-reader"></i> Borrow
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="footer mt-4">
+    <div>
+        <i class="fa-solid fa-book-open"></i> Library &copy; {{ now|date:"Y" }} — Designed with Bootstrap 5 & Font Awesome
+    </div>
+</footer>
+{% endblock %}

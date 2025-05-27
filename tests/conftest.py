@@ -1,55 +1,27 @@
 import pytest
-import os
-import django
-from django.conf import settings
-
-# Configure Django for tests
-def pytest_configure():
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'library_project.settings')
-    django.setup()
+from django.contrib.auth.models import User
+from library.models import Author, Book, Member
 
 @pytest.fixture
 def author():
-    from library.models import Author
-    return Author.objects.create(
-        first_name="Test",
-        last_name="Author"
-    )
+    return Author.objects.create(first_name="Test", last_name="Author")
+
+@pytest.fixture
+def user():
+    return User.objects.create_user(username="testuser", password="pass")
+
+@pytest.fixture
+def member(user):
+    return Member.objects.create(user=user)
 
 @pytest.fixture
 def book(author):
-    from library.models import Book
     return Book.objects.create(
         title="Test Book",
         author=author,
         isbn="1234567890123",
-        publication_date="2023-01-01",
-        quantity=5,
-        available=5
+        category="FICTION",
+        quantity=2,
+        available=2,
+        publication_date="2024-01-01"
     )
-
-@pytest.fixture
-def member():
-    from library.models import Member
-    return Member.objects.create(
-        first_name="Test",
-        last_name="Member",
-        email="testmember@example.com"
-    )
-@pytest.fixture
-def unavailable_book(author):
-    from library.models import Book
-    return Book.objects.create(
-        title="Unavailable Book",
-        author=author,
-        isbn="9876543210123",
-        publication_date="2023-01-01",
-        quantity=0,  # No copies available
-        available=0
-    )
-@pytest.fixture
-def client():
-    from django.test import Client
-    return Client()
-# ... rest of your fixtures ...
-

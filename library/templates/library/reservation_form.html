@@ -16,11 +16,12 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-7">
+    <div class="col-md-8">
         <div class="card shadow-sm border-0">
             <div class="card-body p-4">
                 <h2 class="card-title mb-4 text-center">
-                    <i class="fa-solid fa-book-reader"></i> Borrow Book
+                    <i class="fa-solid fa-calendar-plus"></i>
+                    Reserve Book
                 </h2>
                 <form method="post" novalidate>
                     {% csrf_token %}
@@ -35,7 +36,7 @@
                     {% endfor %}
                     <div class="d-flex justify-content-between">
                         <button type="submit" class="btn btn-primary px-4">
-                            <i class="fa-solid fa-check"></i> Submit
+                            <i class="fa-solid fa-calendar-check"></i> Reserve
                         </button>
                         <a href="{% url 'library:book-list' %}" class="btn btn-secondary px-4">
                             <i class="fa-solid fa-xmark"></i> Cancel
@@ -46,9 +47,5 @@
         </div>
     </div>
 </div>
-<footer class="footer mt-4">
-    <div>
-        <i class="fa-solid fa-book-open"></i> Library &copy; {{ now|date:"Y" }} — Designed with Bootstrap 5 & Font Awesome
-    </div>
-</footer>
+
 {% endblock %}

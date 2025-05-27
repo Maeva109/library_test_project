@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Borrowed Books</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Book</th>
+            <th>Borrower</th>
+            <th>Borrow Date</th>
+            <th>Due Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for borrow in borrows %}
+        <tr class="{% if borrow.is_overdue %}table-danger{% endif %}">
+            <td>{{ borrow.book.title }}</td>
+            <td>{{ borrow.member }}</td>
+            <td>{{ borrow.borrow_date|date:"Y-m-d" }}</td>
+            <td>{{ borrow.due_date|date:"Y-m-d" }}</td>
+            <td>
+                {{ borrow.get_status_display }}
+                {% if borrow.is_overdue %}(Overdue){% endif %}
+            </td>
+            <td>
+                {% if borrow.status != 'RETURNED' %}
+                <form method="post" action="{% url 'library:return-book' borrow.pk %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-success">Return</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

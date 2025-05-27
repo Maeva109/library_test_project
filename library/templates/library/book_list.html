@@ -1,10 +1,142 @@
 {% extends 'base.html' %}
 
+{% block extra_head %}
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+    body, .navbar, .card, .table, .form-control, .form-select, .btn {
+        font-family: 'Poppins', Arial, sans-serif;
+    }
+    .navbar {
+        background: #2563eb;
+    }
+    .navbar-brand, .nav-link, .navbar-text {
+        color: #fff !important;
+        font-weight: 600;
+    }
+    .footer {
+        background: #f1f5f9;
+        color: #64748b;
+        padding: 1rem 0;
+        text-align: center;
+        margin-top: 2rem;
+        border-top: 1px solid #e5e7eb;
+    }
+    .card {
+        border-radius: 1rem;
+        box-shadow: 0 2px 16px rgba(37, 99, 235, 0.08);
+        background: #fff;
+    }
+    .table th, .table td {
+        vertical-align: middle;
+    }
+    .btn-primary, .btn-info, .btn-warning, .btn-danger {
+        border: none;
+    }
+    .btn-primary { background: #2563eb; }
+    .btn-info { background: #38bdf8; }
+    .btn-warning { background: #fbbf24; color: #fff; }
+    .btn-danger { background: #ef4444; }
+    .btn-primary:hover, .btn-info:hover, .btn-warning:hover, .btn-danger:hover {
+        opacity: 0.85;
+    }
+    .search-bar {
+        background: #f1f5f9;
+        border-radius: .5rem;
+        padding: 1rem;
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<h1>Book List</h1>
-<ul>
-{% for book in books %}
-    <li>{{ book.title }} by {{ book.author }}</li>
-{% endfor %}
-</ul>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-11">
+            <div class="card p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="mb-0" style="color:#2563eb;">
+                        <i class="fa-solid fa-book"></i> Book List
+                    </h2>
+                    <a href="{% url 'library:book-create' %}" class="btn btn-primary">
+                        <i class="fa-solid fa-plus"></i> Add Book
+                    </a>
+                </div>
+                <!-- Search Form -->
+                <form method="get" action="{% url 'library:book-search' %}" class="search-bar">
+                    <div class="row g-2 align-items-center">
+                        <div class="col-md-6">
+                            <input type="text" name="q" class="form-control" placeholder="Search by title or author">
+                        </div>
+                        <div class="col-md-4">
+                            <select name="category" class="form-select">
+                                <option value="">All Categories</option>
+                                {% for value, label in categories %}
+                                    <option value="{{ value }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-info w-100">
+                                <i class="fa-solid fa-magnifying-glass"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <!-- Book List Table -->
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th><i class="fa-solid fa-book"></i> Title</th>
+                                <th><i class="fa-solid fa-user-pen"></i> Author</th>
+                                <th><i class="fa-solid fa-layer-group"></i> Category</th>
+                                <th><i class="fa-solid fa-boxes-stacked"></i> Stock</th>
+                                <th><i class="fa-solid fa-gears"></i> Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for book in books %}
+                            <tr>
+                                <td>{{ book.title }}</td>
+                                <td>{{ book.author }}</td>
+                                <td>{{ book.get_category_display }}</td>
+                                <td>
+                                    <span class="badge bg-primary">{{ book.available }}</span>
+                                    <span class="text-muted">/ {{ book.quantity }}</span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'library:book-update' book.pk %}" class="btn btn-sm btn-warning" title="Edit">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </a>
+                                    <a href="{% url 'library:book-delete' book.pk %}" class="btn btn-sm btn-danger" title="Delete">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </a>
+                                    <a href="{% url 'library:reservation-add' %}?book={{ book.pk }}" class="btn btn-sm btn-info" title="Reserve">
+                                        <i class="fa-solid fa-calendar-plus"></i>
+                                    </a>
+                                    {% if book.available > 0 %}
+                                    <a href="{% url 'library:borrow-book' book.pk %}" class="btn btn-sm btn-primary" title="Borrow">
+                                        <i class="fa-solid fa-book-reader"></i>
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div>
+        <i class="fa-solid fa-book-open"></i> Library &copy; {{ now|date:"Y" }} — Designed for Library-UPTOWN
+    </div>
+</footer>
 {% endblock %}

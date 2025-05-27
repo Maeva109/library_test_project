@@ -1,7 +1,7 @@
 import pytest
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from library.models import Book, Author, Member, BorrowRecord
+from library.models import Book, Author, Member, BorrowRecord, Reservation
 
 @pytest.mark.django_db
 class TestAuthorModel:
@@ -46,3 +46,14 @@ class TestBorrowModel:
         
         borrow.return_date = timezone.now().date()
         assert borrow.is_returned
+
+
+@pytest.mark.django_db
+class TestReservationModel:
+    def test_reservation_creation(self, book, member):
+        reservation = Reservation.objects.create(
+            book=book,
+            member=member
+        )
+        assert reservation.status == 'PENDING'
+

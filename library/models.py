@@ -29,7 +29,13 @@ class Book(models.Model):
     publication_date = models.DateField()
     quantity = models.PositiveIntegerField(default=1)
     available = models.PositiveIntegerField(default=1)
-    
+    category = models.CharField(max_length=20, choices=[
+        ('FICTION', 'Fiction'),
+        ('SCI-FI', 'Science Fiction'), 
+        ('BIOGRAPHY', 'Biography'),
+        ('EDUCATION', 'Education')]
+    ,null=True, blank=True)
+
     def __str__(self):
         return self.title
 
@@ -74,3 +80,17 @@ class BorrowRecord(models.Model):
 
     class Meta:
         ordering = ['-borrow_date']
+
+# Example: Add reservation model
+class Reservation(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    member = models.ForeignKey(Member, on_delete=models.CASCADE)
+    reservation_date = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=[
+        ('PENDING', 'Pending'),
+        ('COMPLETED', 'Completed'),
+        ('CANCELLED', 'Cancelled')
+    ], default='PENDING')
+
+    def __str__(self):
+        return f"{self.member}'s reservation for {self.book}"

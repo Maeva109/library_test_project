@@ -4,13 +4,17 @@ from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 
-router.register(r'books', views.BookViewSet, basename='book')
+router.register(r'books', views.BookViewSet, basename='book-api')
 
-router.register(r'authors', views.AuthorViewSet)
+router.register(r'authors', views.AuthorViewSet, basename='author')
 
 app_name = 'library'
 
 urlpatterns = [
+
+    # Include API URLs
+    path('api/', include(router.urls)),
+
     # Author URLs
     path('authors/', views.AuthorListView.as_view(), name='author_list'),
     path('authors/<int:pk>/', views.AuthorDetailView.as_view(), name='author_detail'),
@@ -36,6 +40,9 @@ urlpatterns = [
     path('borrow/list/', views.BorrowListView.as_view(), name='borrow-list'),
     path('borrow/<int:pk>/return/', views.return_book, name='return_book'),
     
-    # Include API URLs
-    path('api/', include(router.urls)),
+   
+
+    # Reservation URLs
+    path('reservations/', views.ReservationListView.as_view(), name='reservation-list'),
+    path('reservations/add/', views.ReservationCreateView.as_view(), name='reservation-add'),
 ]

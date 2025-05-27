@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.db.models import Q
 from rest_framework import viewsets
-from .models import Book, Author, Member, BorrowRecord
+from .models import Book, Author, Member, BorrowRecord, Reservation
 from .forms import BookForm, AuthorForm, MemberForm, BorrowForm
 from .serializers import BookSerializer, AuthorSerializer
 from django.utils import timezone
@@ -157,4 +157,43 @@ class AuthorViewSet(viewsets.ModelViewSet):
 
 
 
+def book_search(request):
+    query = request.GET.get('q')
+    category = request.GET.get('category')
+    
+    books = Book.objects.all()
+    
+    if query:
+        books = books.filter(
+            Q(title__icontains=query) |
+            Q(author__first_name__icontains=query) |
+            Q(author__last_name__icontains=query)
+        )
+    
+    if category:
+        books = books.filter(category__icontains=category)
+    
+    return render(request, 'library/book_search.html', {'books': books})
+
+
+class ReservationCreateView(CreateView):
+    model = Reservation
+    fields = ['book', 'member']
+    template_name = 'library/reservation_form.html'
+    success_url = reverse_lazy('reservation-list')
+
+class ReservationListView(ListView):
+    model = Reservation
+    template_name = 'library/reservation_list.html'
+
+
+class TestReservationViews:
+    def test_create_reservation(self, client, book, member):
+        url = reverse('reservation-add')
+        response = client.post(url, {
+            'book': book.id,
+            'member': member.id
+        })
+        assert response.status_code == 302
+        assert Reservation.objects.count() == 1
 

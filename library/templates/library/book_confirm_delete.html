@@ -1,11 +1,93 @@
 {% extends 'base.html' %}
 
+{% block extra_head %}
+<!-- Google Fonts: Poppins -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+    body {
+        font-family: 'Poppins', Arial, sans-serif;
+        background: #f6f8fb;
+    }
+    .navbar {
+        background: #2563eb;
+    }
+    .navbar-brand, .nav-link, .navbar-text {
+        color: #fff !important;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+    .card {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 4px 24px rgba(37, 99, 235, 0.08);
+        background: #fff;
+    }
+    .btn-danger {
+        background: #ef4444;
+        border: none;
+    }
+    .btn-secondary {
+        background: #e5e7eb;
+        color: #374151;
+        border: none;
+    }
+    .footer {
+        background: #f1f5f9;
+        color: #64748b;
+        padding: 1rem 0;
+        text-align: center;
+        margin-top: 3rem;
+        border-top: 1px solid #e5e7eb;
+    }
+</style>
+{% endblock %}
+
+{% block navbar %}
+<nav class="navbar navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'library:book-list' %}">
+      <i class="fas fa-book-open"></i> Library Manager
+    </a>
+    <span class="navbar-text ms-auto">
+      <i class="fas fa-user"></i> Admin
+    </span>
+  </div>
+</nav>
+{% endblock %}
+
 {% block content %}
-<h1>Confirm Delete</h1>
-<p>Are you sure you want to delete "{{ object }}"?</p>
-<form method="post">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Confirm Delete</button>
-    <a href="{% url 'library:book-list' %}" class="btn btn-secondary">Cancel</a>
-</form>
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+      <div class="card p-4">
+        <div class="card-body text-center">
+          <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+          <h2 class="card-title mb-3" style="font-weight:600;">Confirmer la suppression</h2>
+          <p class="mb-4" style="color:#64748b;">
+            Êtes-vous sûr de vouloir supprimer <strong>"{{ object }}"</strong> ?
+          </p>
+          <form method="post" class="d-flex flex-column gap-3 align-items-center">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger px-4">
+              <i class="fas fa-trash-alt me-2"></i> Confirmer la suppression
+            </button>
+            <a href="{% url 'library:book-list' %}" class="btn btn-secondary px-4">
+              <i class="fas fa-arrow-left me-2"></i> Annuler
+            </a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<div class="footer">
+  <span>
+    <i class="fas fa-book-reader"></i> Library Project &copy; {{ year|default:2025 }}
+  </span>
+</div>
 {% endblock %}

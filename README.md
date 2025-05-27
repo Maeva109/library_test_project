@@ -2,6 +2,9 @@
 
 Ce projet est une application de gestion de bibliothèque développée avec Django. Elle permet de gérer les livres, les auteurs, les membres, les emprunts et les réservations, avec une interface utilisateur moderne et responsive grâce à Bootstrap 5.
 
+## Accès à l’application
+
+- Accédez à votre projet via : [http://127.0.0.1:8000/library/books/](http://127.0.0.1:8000/library/books/)
 
 ## Installation
 1. Clone the repository
@@ -27,11 +30,7 @@ Ce projet est une application de gestion de bibliothèque développée avec Djan
     "author": 1,
     "isbn": "1234567890123"
 }
-
-
-
-   ```
-
+```
 
 ## Utilisation
 
